@@ -1,59 +1,50 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Book } from '../shared/book';
 import { BookRatingService } from '../shared/book-rating.service';
+import { BookStoreService } from '../shared/book-store.service';
+import { Store, select } from '@ngrx/store';
+import { loadBooks } from '../actions/book.actions';
+import { selectBooks, selectBooksLoading } from '../selectors/book.selectors';
 
 @Component({
   selector: 'br-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
+  // VORSICHT: gleich Bug bei HTTP
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
 
-  books: Book[];
+  books$ = this.store.pipe(select(selectBooks));
+  loading$ = this.store.pipe(select(selectBooksLoading));
 
-  constructor(private br: BookRatingService) { }
+  constructor(private store: Store<{}>) { }
 
   ngOnInit() {
-    this.books = [
-      {
-        isbn: '000',
-        title: 'Angular',
-        description: 'Tolles Buch',
-        rating: 5
-      },
-      {
-        isbn: '111',
-        title: 'AngularJS',
-        description: 'Altes Buch',
-        rating: 3
-      },
-      {
-        isbn: '222',
-        title: 'Python',
-        description: 'Hilfe, ein Leerzeichen zuviel!',
-        rating: 1
-      },
-    ];
+    this.store.dispatch(loadBooks());
   }
 
   doRateDown(book: Book) {
     // const ratedBook = this.br.rateDown(book);
-    const ratedBook = {
-      ...book,
-      rating: Math.max(--book.rating, 1)
-    };
-
-    this.update(ratedBook);
+    // this.update(ratedBook);
   }
 
   doRateUp(book: Book) {
-    const ratedBook = this.br.rateUp(book);
-    this.update(ratedBook);
+    // const ratedBook = this.br.rateUp(book);
+    // // const ratedBook = {
+    // //   ...book,
+    // //   rating: Math.min(++book.rating, 5)
+    // // };
+    // this.update(ratedBook);
   }
 
   update(ratedBook: Book) {
-    this.books = this.books
-      .map(book => book.isbn === ratedBook.isbn ? ratedBook : book)
-      .sort((a, b) => b.rating - a.rating);
+    // this.books = this.books
+    //   .map(book => book.isbn === ratedBook.isbn ? ratedBook : book)
+    //   .sort((a, b) => b.rating - a.rating);
+  }
+
+  doCreate(book: Book) {
+    // this.books = [...this.books, book];
   }
 }
